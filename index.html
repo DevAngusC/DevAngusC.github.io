@@ -29,6 +29,7 @@
       height: 100%;
       position: absolute;
       transform-style: preserve-3d;
+      transform: rotateX(15deg); /* 將整個旋轉面前傾 */
     }
     .carousel__item {
       position: absolute;
@@ -79,7 +80,7 @@
 
     function getRadius() {
       const minDimension = Math.min(window.innerWidth, window.innerHeight);
-      return Math.max(0.35 * minDimension, 180); // 更靠近 Y 軸中心，圖片可放大但集中
+      return Math.max(0.35 * minDimension, 180);
     }
 
     function updateCarousel() {
@@ -87,7 +88,7 @@
       const radius = getRadius();
       items.forEach((item, i) => {
         const itemAngle = step * i + angle;
-        item.style.transform = `rotateY(${itemAngle}deg) translateZ(${radius}px) rotateY(${-itemAngle}deg)`;
+        item.style.transform = `rotateY(${itemAngle}deg) translateZ(${radius}px) rotateY(${-itemAngle}deg) rotateX(-15deg)`;
       });
     }
 
@@ -103,6 +104,5 @@
   </script>
 </body>
 </html>
-
 
 

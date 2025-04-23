@@ -18,7 +18,7 @@
       position: relative;
       width: 100vw;
       max-width: 1000px;
-      height: 400px;
+      height: 500px;
       perspective: 1200px;
       overflow: hidden;
     }
@@ -30,10 +30,10 @@
     }
     .carousel__item {
       position: absolute;
-      width: 200px;
-      height: 130px;
-      top: 135px;
-      left: calc(50% - 100px);
+      width: 320px;
+      height: 200px;
+      top: 150px;
+      left: calc(50% - 160px);
       transform-style: preserve-3d;
     }
     .carousel__item img {
@@ -50,11 +50,11 @@
 <body>
   <div class="carousel">
     <div class="carousel__container" id="carousel">
-      <a class="carousel__item"><img src="https://picsum.photos/id/1011/400/300" /></a>
-      <a class="carousel__item"><img src="https://picsum.photos/id/1012/400/300" /></a>
-      <a class="carousel__item"><img src="https://picsum.photos/id/1013/400/300" /></a>
-      <a class="carousel__item"><img src="https://picsum.photos/id/1014/400/300" /></a>
-      <a class="carousel__item"><img src="https://picsum.photos/id/1015/400/300" /></a>
+      <a class="carousel__item"><img src="https://picsum.photos/id/1011/600/400" /></a>
+      <a class="carousel__item"><img src="https://picsum.photos/id/1012/600/400" /></a>
+      <a class="carousel__item"><img src="https://picsum.photos/id/1013/600/400" /></a>
+      <a class="carousel__item"><img src="https://picsum.photos/id/1014/600/400" /></a>
+      <a class="carousel__item"><img src="https://picsum.photos/id/1015/600/400" /></a>
     </div>
   </div>
 
@@ -62,7 +62,7 @@
     const container = document.getElementById('carousel');
     const items = container.querySelectorAll('.carousel__item');
     const total = items.length;
-    const radius = 350;
+    const radius = 280; // 更靠近 Y 軸中心
     let angle = 0;
 
     function updateCarousel() {
@@ -75,7 +75,7 @@
     }
 
     function animate() {
-      angle += 0.2; // 控制旋轉速度
+      angle += 0.2;
       updateCarousel();
       requestAnimationFrame(animate);
     }
@@ -85,6 +85,7 @@
   </script>
 </body>
 </html>
+
 
 
 

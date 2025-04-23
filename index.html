@@ -3,8 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>動態保持面向使用者的 3D 圓形作品展示</title>
+  <title>自適應比例 3D 旋轉展示</title>
   <style>
+    * {
+      box-sizing: border-box;
+    }
     body {
       margin: 0;
       background: #111;
@@ -17,10 +20,9 @@
     .carousel {
       position: relative;
       width: 100vw;
-      max-width: 1000px;
-      height: 500px;
+      height: 56.25vw; /* 16:9 比例 */
+      max-height: 100vh;
       perspective: 1200px;
-      overflow: hidden;
     }
     .carousel__container {
       width: 100%;
@@ -30,10 +32,10 @@
     }
     .carousel__item {
       position: absolute;
-      width: 500px;
-      height: 360px;
-      top: 150px;
-      left: calc(50% - 250px);
+      width: 32vw;
+      height: 20vw;
+      top: calc(50% - 10vw);
+      left: calc(50% - 16vw);
       transform-style: preserve-3d;
     }
     .carousel__item img {
@@ -44,6 +46,17 @@
       border-radius: 10px;
       cursor: pointer;
       backface-visibility: hidden;
+    }
+    @media (max-aspect-ratio: 1/1) {
+      .carousel {
+        height: 80vh;
+      }
+      .carousel__item {
+        width: 60vw;
+        height: 37.5vw;
+        top: calc(50% - 18.75vw);
+        left: calc(50% - 30vw);
+      }
     }
   </style>
 </head>
@@ -62,15 +75,19 @@
     const container = document.getElementById('carousel');
     const items = container.querySelectorAll('.carousel__item');
     const total = items.length;
-    const radius = 280; // 更靠近 Y 軸中心
     let angle = 0;
+
+    function getRadius() {
+      const w = window.innerWidth;
+      return Math.max(0.33 * w, 240); // 依視窗寬度調整旋轉半徑
+    }
 
     function updateCarousel() {
       const step = 360 / total;
+      const radius = getRadius();
       items.forEach((item, i) => {
         const itemAngle = step * i + angle;
-        const rotate = `rotateY(${itemAngle}deg) translateZ(${radius}px) rotateY(${-itemAngle}deg)`;
-        item.style.transform = rotate;
+        item.style.transform = `rotateY(${itemAngle}deg) translateZ(${radius}px) rotateY(${-itemAngle}deg)`;
       });
     }
 
@@ -80,12 +97,11 @@
       requestAnimationFrame(animate);
     }
 
+    window.addEventListener('resize', updateCarousel);
     updateCarousel();
     animate();
   </script>
 </body>
 </html>
-
-
 
 

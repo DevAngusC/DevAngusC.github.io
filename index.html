@@ -5,6 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>自適應比例 3D 旋轉展示</title>
   <style>
+    :root {
+      --item-width: 40vmin;
+      --item-height: 25vmin;
+    }
+
     * {
       box-sizing: border-box;
     }
@@ -32,10 +37,10 @@
     }
     .carousel__item {
       position: absolute;
-      width: 40vmin;
-      height: 25vmin;
-      top: calc(50% - 12.5vmin);
-      left: calc(50% - 20vmin);
+      width: var(--item-width);
+      height: var(--item-height);
+      top: calc(50% - calc(var(--item-height) / 2));
+      left: calc(50% - calc(var(--item-width) / 2));
       transform-style: preserve-3d;
     }
     .carousel__item img {
@@ -48,14 +53,12 @@
       backface-visibility: hidden;
     }
     @media (max-aspect-ratio: 1/1) {
+      :root {
+        --item-width: 70vmin;
+        --item-height: 43.75vmin;
+      }
       .carousel {
         height: 80vh;
-      }
-      .carousel__item {
-        width: 70vmin;
-        height: 43.75vmin;
-        top: calc(50% - 21.875vmin);
-        left: calc(50% - 35vmin);
       }
     }
   </style>
@@ -72,10 +75,13 @@
   </div>
 
   <script>
-    const tiltAngle = -10; // 傾斜角度變數
+    const tiltAngle = -10; // 傾斜角度
+    const rotateSpeed = 0.1; // 旋轉速度
+    const radiusRatio = 0.35; // 半徑比例
+    const minRadius = 180; // 半徑下限
 
     const container = document.getElementById('carousel');
-    container.style.transform = `rotateX(${tiltAngle}deg)`; // 動態設定旋轉平面傾斜角
+    container.style.transform = `rotateX(${tiltAngle}deg)`;
 
     const items = container.querySelectorAll('.carousel__item');
     const total = items.length;
@@ -83,7 +89,7 @@
 
     function getRadius() {
       const minDimension = Math.min(window.innerWidth, window.innerHeight);
-      return Math.max(0.35 * minDimension, 180);
+      return Math.max(radiusRatio * minDimension, minRadius);
     }
 
     function updateCarousel() {
@@ -96,7 +102,7 @@
     }
 
     function animate() {
-      angle += 0.2;
+      angle += rotateSpeed;
       updateCarousel();
       requestAnimationFrame(animate);
     }

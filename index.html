@@ -28,6 +28,7 @@
       height: 56.25vw;
       max-height: 100vh;
       perspective: 1200px;
+      touch-action: none;
     }
     .carousel__container {
       width: 100%;
@@ -49,8 +50,9 @@
       object-fit: cover;
       border: 2px solid #fff;
       border-radius: 10px;
-      cursor: pointer;
+      cursor: grab;
       backface-visibility: hidden;
+      user-select: none;
     }
     @media (max-aspect-ratio: 1/1) {
       :root {
@@ -64,28 +66,34 @@
   </style>
 </head>
 <body>
-  <div class="carousel">
+  <div class="carousel" id="carouselRoot">
     <div class="carousel__container" id="carousel">
-      <a class="carousel__item"><img src="https://picsum.photos/id/1011/600/400" /></a>
-      <a class="carousel__item"><img src="https://picsum.photos/id/1012/600/400" /></a>
-      <a class="carousel__item"><img src="https://picsum.photos/id/1013/600/400" /></a>
-      <a class="carousel__item"><img src="https://picsum.photos/id/1014/600/400" /></a>
-      <a class="carousel__item"><img src="https://picsum.photos/id/1015/600/400" /></a>
+      <a class="carousel__item"><img src="https://picsum.photos/id/1011/600/400" draggable="false" /></a>
+      <a class="carousel__item"><img src="https://picsum.photos/id/1012/600/400" draggable="false" /></a>
+      <a class="carousel__item"><img src="https://picsum.photos/id/1013/600/400" draggable="false" /></a>
+      <a class="carousel__item"><img src="https://picsum.photos/id/1014/600/400" draggable="false" /></a>
+      <a class="carousel__item"><img src="https://picsum.photos/id/1015/600/400" draggable="false" /></a>
     </div>
   </div>
 
   <script>
-    const tiltAngle = -10; // 傾斜角度
-    const rotateSpeed = 0.02; // 旋轉速度
-    const radiusRatio = 0.35; // 半徑比例
-    const minRadius = 180; // 半徑下限
+    const tiltAngle = -10;
+    const baseRotateSpeed = 0.02;
+    const maxRotateMultiplier = 2.0; // 可調整倍數倍率
+    const radiusRatio = 0.35;
+    const minRadius = 180;
+
+    let rotateSpeed = baseRotateSpeed;
+    let isDragging = false;
+    let isPressed = false;
+    let lastX = null;
+    let angle = 0;
 
     const container = document.getElementById('carousel');
     container.style.transform = `rotateX(${tiltAngle}deg)`;
 
     const items = container.querySelectorAll('.carousel__item');
     const total = items.length;
-    let angle = 0;
 
     function getRadius() {
       const minDimension = Math.min(window.innerWidth, window.innerHeight);
@@ -102,10 +110,48 @@
     }
 
     function animate() {
-      angle += rotateSpeed;
+      if (!isDragging) angle += rotateSpeed;
       updateCarousel();
       requestAnimationFrame(animate);
     }
+
+    function onStart(x) {
+      isPressed = true;
+      isDragging = false;
+      lastX = x;
+    }
+
+    function onMove(x) {
+      if (!isPressed) return;
+      if (!isDragging && lastX !== null && Math.abs(x - lastX) > 1) {
+        isDragging = true;
+      }
+      if (isDragging && lastX !== null) {
+        const dx = x - lastX;
+        angle += dx * 0.2;
+        rotateSpeed = dx * 0.005;
+        lastX = x;
+      }
+    }
+
+    function onEnd() {
+      if (isPressed) {
+        isDragging = false;
+        isPressed = false;
+        lastX = null;
+        rotateSpeed = Math.max(Math.min(rotateSpeed, baseRotateSpeed * maxRotateMultiplier), -baseRotateSpeed * maxRotateMultiplier);
+      }
+    }
+
+    const root = document.getElementById('carouselRoot');
+    root.addEventListener('mousedown', e => onStart(e.clientX));
+    root.addEventListener('mousemove', e => onMove(e.clientX));
+    root.addEventListener('mouseup', onEnd);
+    root.addEventListener('mouseleave', onEnd);
+
+    root.addEventListener('touchstart', e => onStart(e.touches[0].clientX));
+    root.addEventListener('touchmove', e => onMove(e.touches[0].clientX));
+    root.addEventListener('touchend', onEnd);
 
     window.addEventListener('resize', updateCarousel);
     updateCarousel();

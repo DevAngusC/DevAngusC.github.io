@@ -20,7 +20,7 @@
     .carousel {
       position: relative;
       width: 100vw;
-      height: 56.25vw; /* 16:9 比例 */
+      height: 56.25vw;
       max-height: 100vh;
       perspective: 1200px;
     }
@@ -32,10 +32,10 @@
     }
     .carousel__item {
       position: absolute;
-      width: 32vw;
-      height: 20vw;
-      top: calc(50% - 10vw);
-      left: calc(50% - 16vw);
+      width: 32vmin;
+      height: 20vmin;
+      top: calc(50% - 10vmin);
+      left: calc(50% - 16vmin);
       transform-style: preserve-3d;
     }
     .carousel__item img {
@@ -52,10 +52,10 @@
         height: 80vh;
       }
       .carousel__item {
-        width: 60vw;
-        height: 37.5vw;
-        top: calc(50% - 18.75vw);
-        left: calc(50% - 30vw);
+        width: 60vmin;
+        height: 37.5vmin;
+        top: calc(50% - 18.75vmin);
+        left: calc(50% - 30vmin);
       }
     }
   </style>
@@ -78,8 +78,8 @@
     let angle = 0;
 
     function getRadius() {
-      const w = window.innerWidth;
-      return Math.max(0.33 * w, 240); // 依視窗寬度調整旋轉半徑
+      const minDimension = Math.min(window.innerWidth, window.innerHeight);
+      return Math.max(0.6 * minDimension, 200); // 依較小邊控制旋轉半徑，避免過寬撐大
     }
 
     function updateCarousel() {

@@ -32,10 +32,10 @@
     }
     .carousel__item {
       position: absolute;
-      width: 32vmin;
-      height: 20vmin;
-      top: calc(50% - 10vmin);
-      left: calc(50% - 16vmin);
+      width: 40vmin;
+      height: 25vmin;
+      top: calc(50% - 12.5vmin);
+      left: calc(50% - 20vmin);
       transform-style: preserve-3d;
     }
     .carousel__item img {
@@ -52,10 +52,10 @@
         height: 80vh;
       }
       .carousel__item {
-        width: 60vmin;
-        height: 37.5vmin;
-        top: calc(50% - 18.75vmin);
-        left: calc(50% - 30vmin);
+        width: 70vmin;
+        height: 43.75vmin;
+        top: calc(50% - 21.875vmin);
+        left: calc(50% - 35vmin);
       }
     }
   </style>
@@ -79,7 +79,7 @@
 
     function getRadius() {
       const minDimension = Math.min(window.innerWidth, window.innerHeight);
-      return Math.max(0.6 * minDimension, 200); // 依較小邊控制旋轉半徑，避免過寬撐大
+      return Math.max(0.35 * minDimension, 180); // 更靠近 Y 軸中心，圖片可放大但集中
     }
 
     function updateCarousel() {
@@ -103,5 +103,6 @@
   </script>
 </body>
 </html>
+
 
 

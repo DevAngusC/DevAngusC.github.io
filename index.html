@@ -2,10 +2,88 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8">
-  <title>我的作品集</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DevAngusC 的作品集</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
+    }
+    header {
+      background-color: #111;
+      color: white;
+      padding: 1.5rem;
+      text-align: center;
+    }
+    .container {
+      max-width: 1000px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+    .card {
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      overflow: hidden;
+      transition: transform 0.3s;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+    }
+    .card img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+    }
+    .card-body {
+      padding: 1rem;
+    }
+    .card-body h3 {
+      margin-top: 0;
+      font-size: 1.25rem;
+      color: #333;
+    }
+    .card-body p {
+      color: #666;
+      font-size: 0.95rem;
+    }
+  </style>
 </head>
 <body>
-  <h1>歡迎來到 DevAngusC 的網站</h1>
-  <p>這是我第一次使用 GitHub Pages 建立網站！</p>
+
+  <header>
+    <h1>DevAngusC 的作品集</h1>
+    <p>探索我的設計與創作</p>
+  </header>
+
+  <div class="container">
+    <div class="card">
+      <img src="https://picsum.photos/600/400?random=1" alt="作品一">
+      <div class="card-body">
+        <h3>作品一：極簡住宅空間</h3>
+        <p>這是一個以自然光與白色材質構成的極簡風住宅設計。</p>
+      </div>
+    </div>
+    <div class="card">
+      <img src="https://picsum.photos/600/400?random=2" alt="作品二">
+      <div class="card-body">
+        <h3>作品二：AI 概念渲染</h3>
+        <p>透過 Stable Diffusion 生成的建築概念草圖，融合未來感與自然場域。</p>
+      </div>
+    </div>
+    <div class="card">
+      <img src="https://picsum.photos/600/400?random=3" alt="作品三">
+      <div class="card-body">
+        <h3>作品三：設計流程紀錄</h3>
+        <p>從手繪草圖到 3D 模型，完整呈現室內設計發展過程。</p>
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>

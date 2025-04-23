@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>環形旋轉作品展示</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>動態保持面向使用者的 3D 圓形作品展示</title>
   <style>
     body {
       margin: 0;
@@ -25,7 +25,6 @@
       height: 100%;
       position: absolute;
       transform-style: preserve-3d;
-      animation: spin 20s linear infinite;
     }
     .carousel__item {
       position: absolute;
@@ -44,32 +43,45 @@
       cursor: pointer;
       backface-visibility: hidden;
     }
-    @keyframes spin {
-      from { transform: rotateY(0deg); }
-      to { transform: rotateY(-360deg); }
-    }
   </style>
 </head>
 <body>
   <div class="carousel">
     <div class="carousel__container" id="carousel">
-      <a class="carousel__item" href="#" style="transform: rotateY(0deg) translateZ(500px) rotateY(0deg);">
-        <img src="https://picsum.photos/id/1011/400/300" />
-      </a>
-      <a class="carousel__item" href="#" style="transform: rotateY(72deg) translateZ(500px) rotateY(-72deg);">
-        <img src="https://picsum.photos/id/1012/400/300" />
-      </a>
-      <a class="carousel__item" href="#" style="transform: rotateY(144deg) translateZ(500px) rotateY(-144deg);">
-        <img src="https://picsum.photos/id/1013/400/300" />
-      </a>
-      <a class="carousel__item" href="#" style="transform: rotateY(216deg) translateZ(500px) rotateY(-216deg);">
-        <img src="https://picsum.photos/id/1014/400/300" />
-      </a>
-      <a class="carousel__item" href="#" style="transform: rotateY(288deg) translateZ(500px) rotateY(-288deg);">
-        <img src="https://picsum.photos/id/1015/400/300" />
-      </a>
+      <a class="carousel__item"><img src="https://picsum.photos/id/1011/400/300" /></a>
+      <a class="carousel__item"><img src="https://picsum.photos/id/1012/400/300" /></a>
+      <a class="carousel__item"><img src="https://picsum.photos/id/1013/400/300" /></a>
+      <a class="carousel__item"><img src="https://picsum.photos/id/1014/400/300" /></a>
+      <a class="carousel__item"><img src="https://picsum.photos/id/1015/400/300" /></a>
     </div>
   </div>
+
+  <script>
+    const container = document.getElementById('carousel');
+    const items = container.querySelectorAll('.carousel__item');
+    const total = items.length;
+    const radius = 500;
+    let angle = 0;
+
+    function updateCarousel() {
+      const step = 360 / total;
+      items.forEach((item, i) => {
+        const itemAngle = step * i + angle;
+        const rotate = `rotateY(${itemAngle}deg) translateZ(${radius}px) rotateY(${-itemAngle}deg)`;
+        item.style.transform = rotate;
+      });
+    }
+
+    function animate() {
+      angle += 0.2; // 轉速
+      updateCarousel();
+      requestAnimationFrame(animate);
+    }
+
+    updateCarousel();
+    animate();
+  </script>
 </body>
 </html>
+
 

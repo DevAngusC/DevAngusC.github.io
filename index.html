@@ -13,30 +13,32 @@
       align-items: center;
       height: 100vh;
       overflow: hidden;
+      touch-action: pan-y;
     }
     .carousel {
       position: relative;
-      width: 400px;
-      height: 400px;
-      perspective: 1000px;
+      width: 360px;
+      height: 360px;
+      perspective: 1200px;
+      touch-action: none;
     }
     .carousel__container {
       width: 100%;
       height: 100%;
       position: absolute;
       transform-style: preserve-3d;
-      transition: transform 1s;
+      transition: transform 0.5s ease-in-out;
     }
     .carousel__item {
       position: absolute;
-      width: 260px;
-      height: 180px;
-      left: 70px;
-      top: 110px;
+      width: 240px;
+      height: 160px;
+      left: 60px;
+      top: 100px;
       border-radius: 10px;
       overflow: hidden;
       transform-style: preserve-3d;
-      transition: transform 1s;
+      transition: transform 0.5s ease;
     }
     .carousel__item img {
       width: 100%;
@@ -44,22 +46,6 @@
       object-fit: cover;
       border: 2px solid #fff;
       border-radius: 10px;
-      cursor: pointer;
-    }
-    .controls {
-      position: absolute;
-      top: 50%;
-      width: 100%;
-      display: flex;
-      justify-content: space-between;
-      transform: translateY(-50%);
-    }
-    .control {
-      background: rgba(255, 255, 255, 0.2);
-      border: none;
-      color: #fff;
-      font-size: 2rem;
-      padding: 0.5rem 1rem;
       cursor: pointer;
     }
   </style>
@@ -73,10 +59,6 @@
       <a class="carousel__item" href="#"><img src="https://picsum.photos/id/1045/400/300" /></a>
       <a class="carousel__item" href="#"><img src="https://picsum.photos/id/1055/400/300" /></a>
     </div>
-    <div class="controls">
-      <button class="control" onclick="rotate(-1)">&#8592;</button>
-      <button class="control" onclick="rotate(1)">&#8594;</button>
-    </div>
   </div>
 
   <script>
@@ -84,27 +66,53 @@
     const items = document.querySelectorAll('.carousel__item');
     let angle = 0;
     const total = items.length;
+    let startX = 0;
+    let currentX = 0;
+    let rotating = false;
+    let autoRotateInterval;
 
     function updateCarousel() {
       const deg = 360 / total;
       items.forEach((item, i) => {
         const rotateY = deg * i + angle;
-        item.style.transform = `rotateY(${rotateY}deg) translateZ(400px)`;
+        item.style.transform = `rotateY(${rotateY}deg) translateZ(380px)`;
       });
     }
 
-    function rotate(dir) {
-      angle += dir * (360 / total);
-      updateCarousel();
+    function startAutoRotate() {
+      autoRotateInterval = setInterval(() => {
+        angle += 360 / total;
+        updateCarousel();
+      }, 5000);
     }
 
-    // 初始化位置
-    updateCarousel();
+    function stopAutoRotate() {
+      clearInterval(autoRotateInterval);
+    }
 
-    // 自動旋轉
-    setInterval(() => {
-      rotate(1);
-    }, 5000);
+    carousel.addEventListener('pointerdown', (e) => {
+      stopAutoRotate();
+      startX = e.clientX;
+      rotating = true;
+      carousel.setPointerCapture(e.pointerId);
+    });
+
+    carousel.addEventListener('pointermove', (e) => {
+      if (!rotating) return;
+      currentX = e.clientX;
+      const deltaX = currentX - startX;
+      angle += deltaX * 0.3;
+      startX = currentX;
+      updateCarousel();
+    });
+
+    carousel.addEventListener('pointerup', (e) => {
+      rotating = false;
+      startAutoRotate();
+    });
+
+    updateCarousel();
+    startAutoRotate();
   </script>
 </body>
 </html>

@@ -58,7 +58,6 @@
       color: #555;
     }
 
-    /* 旋轉模組樣式 */
     .carousel-section {
       background-color: #111;
       padding: 3rem 1rem;
@@ -79,7 +78,7 @@
       height: 100%;
       position: absolute;
       transform-style: preserve-3d;
-      transition: transform 0.5s ease-in-out;
+      transition: transform 0.2s ease-out;
     }
     .carousel__item {
       position: absolute;
@@ -124,7 +123,6 @@
     <p>設計 x 技術 x 思考</p>
   </header>
 
-  <!-- 旋轉作品展示模組 -->
   <section class="carousel-section">
     <div class="carousel">
       <div class="carousel__container" id="carousel">
@@ -137,7 +135,6 @@
     </div>
   </section>
 
-  <!-- 卡片作品區塊 -->
   <div class="container">
     <div class="card">
       <img src="https://picsum.photos/600/400?random=1" alt="作品一">
@@ -169,8 +166,11 @@
     const total = items.length;
     let startX = 0;
     let currentX = 0;
+    let velocity = 0;
+    let lastTime = 0;
     let rotating = false;
     let autoRotateInterval;
+    const maxSpeed = 15; // 限制旋轉速度上限
 
     function updateCarousel() {
       const deg = 360 / total;
@@ -191,9 +191,22 @@
       clearInterval(autoRotateInterval);
     }
 
+    let momentumTimer;
+    function applyMomentum() {
+      cancelAnimationFrame(momentumTimer);
+      velocity = Math.max(-maxSpeed, Math.min(maxSpeed, velocity));
+      if (Math.abs(velocity) < 0.1) return;
+      angle += velocity;
+      velocity *= 0.95; // 慣性衰減
+      updateCarousel();
+      momentumTimer = requestAnimationFrame(applyMomentum);
+    }
+
     carousel.addEventListener('pointerdown', (e) => {
       stopAutoRotate();
       startX = e.clientX;
+      lastTime = Date.now();
+      velocity = 0;
       rotating = true;
       carousel.setPointerCapture(e.pointerId);
     });
@@ -201,14 +214,19 @@
     carousel.addEventListener('pointermove', (e) => {
       if (!rotating) return;
       currentX = e.clientX;
+      const now = Date.now();
       const deltaX = currentX - startX;
+      const deltaT = now - lastTime;
+      velocity = deltaX / deltaT * 10;
       angle += deltaX * 0.3;
       startX = currentX;
+      lastTime = now;
       updateCarousel();
     });
 
-    carousel.addEventListener('pointerup', (e) => {
+    carousel.addEventListener('pointerup', () => {
       rotating = false;
+      applyMomentum();
       startAutoRotate();
     });
 
@@ -217,4 +235,3 @@
   </script>
 </body>
 </html>
-

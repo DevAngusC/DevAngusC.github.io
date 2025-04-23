@@ -16,9 +16,11 @@
     }
     .carousel {
       position: relative;
-      width: 600px;
+      width: 100vw;
+      max-width: 1000px;
       height: 400px;
       perspective: 1200px;
+      overflow: hidden;
     }
     .carousel__container {
       width: 100%;
@@ -28,10 +30,10 @@
     }
     .carousel__item {
       position: absolute;
-      width: 240px;
-      height: 160px;
-      top: 120px;
-      left: 180px;
+      width: 200px;
+      height: 130px;
+      top: 135px;
+      left: calc(50% - 100px);
       transform-style: preserve-3d;
     }
     .carousel__item img {
@@ -60,7 +62,7 @@
     const container = document.getElementById('carousel');
     const items = container.querySelectorAll('.carousel__item');
     const total = items.length;
-    const radius = 500;
+    const radius = 350;
     let angle = 0;
 
     function updateCarousel() {
@@ -73,7 +75,7 @@
     }
 
     function animate() {
-      angle += 0.2; // 轉速
+      angle += 0.2; // 控制旋轉速度
       updateCarousel();
       requestAnimationFrame(animate);
     }
@@ -83,5 +85,6 @@
   </script>
 </body>
 </html>
+
 
 

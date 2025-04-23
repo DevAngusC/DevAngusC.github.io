@@ -1,121 +1,110 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DevAngusC 的作品集</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>旋轉作品展示</title>
   <style>
-    * {
-      box-sizing: border-box;
-    }
-
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans TC", sans-serif;
       margin: 0;
-      padding: 0;
-      background-color: #f9f9f9;
-      color: #333;
-    }
-
-    header {
-      background-color: #111;
-      color: white;
-      text-align: center;
-      padding: 2rem 1rem;
-    }
-
-    .container {
-      max-width: 1200px;
-      margin: 2rem auto;
-      padding: 0 1rem;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 2rem;
-    }
-
-    .card {
-      background-color: #fff;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      background: #111;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
       overflow: hidden;
-      transition: transform 0.2s ease;
     }
-
-    .card:hover {
-      transform: translateY(-6px);
+    .carousel {
+      position: relative;
+      width: 400px;
+      height: 400px;
+      perspective: 1000px;
     }
-
-    .card img {
+    .carousel__container {
       width: 100%;
-      height: auto;
-      display: block;
+      height: 100%;
+      position: absolute;
+      transform-style: preserve-3d;
+      transition: transform 1s;
     }
-
-    .card-body {
-      padding: 1.25rem;
+    .carousel__item {
+      position: absolute;
+      width: 260px;
+      height: 180px;
+      left: 70px;
+      top: 110px;
+      border-radius: 10px;
+      overflow: hidden;
+      transform-style: preserve-3d;
+      transition: transform 1s;
     }
-
-    .card-body h3 {
-      margin-top: 0;
-      margin-bottom: 0.5rem;
-      font-size: 1.2rem;
+    .carousel__item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border: 2px solid #fff;
+      border-radius: 10px;
+      cursor: pointer;
     }
-
-    .card-body p {
-      margin: 0;
-      font-size: 0.95rem;
-      color: #555;
+    .controls {
+      position: absolute;
+      top: 50%;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      transform: translateY(-50%);
     }
-
-    @media (max-width: 480px) {
-      header h1 {
-        font-size: 1.6rem;
-      }
-
-      .card-body {
-        padding: 1rem;
-      }
-
-      .card-body h3 {
-        font-size: 1.1rem;
-      }
-
-      .card-body p {
-        font-size: 0.9rem;
-      }
+    .control {
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      color: #fff;
+      font-size: 2rem;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
-
-  <header>
-    <h1>DevAngusC 的作品集</h1>
-    <p>設計 x 技術 x 思考</p>
-  </header>
-
-  <div class="container">
-    <div class="card">
-      <img src="https://picsum.photos/600/400?random=1" alt="作品一">
-      <div class="card-body">
-        <h3>作品一：極簡住宅空間</h3>
-        <p>以自然光與白色材質構成的極簡空間設計。</p>
-      </div>
+  <div class="carousel">
+    <div class="carousel__container" id="carousel">
+      <a class="carousel__item" href="#"><img src="https://picsum.photos/id/1015/400/300" /></a>
+      <a class="carousel__item" href="#"><img src="https://picsum.photos/id/1025/400/300" /></a>
+      <a class="carousel__item" href="#"><img src="https://picsum.photos/id/1035/400/300" /></a>
+      <a class="carousel__item" href="#"><img src="https://picsum.photos/id/1045/400/300" /></a>
+      <a class="carousel__item" href="#"><img src="https://picsum.photos/id/1055/400/300" /></a>
     </div>
-    <div class="card">
-      <img src="https://picsum.photos/600/400?random=2" alt="作品二">
-      <div class="card-body">
-        <h3>作品二：AI 概念渲染</h3>
-        <p>以 AI 圖像呈現空間未來感與材料感。</p>
-      </div>
-    </div>
-    <div class="card">
-      <img src="https://picsum.photos/600/400?random=3" alt="作品三">
-      <div class="card-body">
-        <h3>作品三：設計流程紀錄</h3>
-        <p>設計從草圖到建模的完整記錄展示。</p>
-      </div>
+    <div class="controls">
+      <button class="control" onclick="rotate(-1)">&#8592;</button>
+      <button class="control" onclick="rotate(1)">&#8594;</button>
     </div>
   </div>
 
+  <script>
+    const carousel = document.getElementById('carousel');
+    const items = document.querySelectorAll('.carousel__item');
+    let angle = 0;
+    const total = items.length;
+
+    function updateCarousel() {
+      const deg = 360 / total;
+      items.forEach((item, i) => {
+        const rotateY = deg * i + angle;
+        item.style.transform = `rotateY(${rotateY}deg) translateZ(400px)`;
+      });
+    }
+
+    function rotate(dir) {
+      angle += dir * (360 / total);
+      updateCarousel();
+    }
+
+    // 初始化位置
+    updateCarousel();
+
+    // 自動旋轉
+    setInterval(() => {
+      rotate(1);
+    }, 5000);
+  </script>
 </body>
 </html>

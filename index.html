@@ -32,6 +32,7 @@
       height: 100%;
       position: absolute;
       transform-style: preserve-3d;
+      transform: rotateX(-10deg);
     }
     .carousel__item {
       position: absolute;
@@ -98,6 +99,7 @@
     const radiusRatio = 0.35;
     const minRadius = 180;
     const easingBackToBase = 0.995;
+    const focusEasingFactor = 0.15;
 
     let rotateSpeed = baseRotateSpeed;
     let isDragging = false;
@@ -110,10 +112,9 @@
     let focusedIndex = null;
     let targetAngle = null;
     let focusTimeout = null;
-    const focusEasing = 0.01;
+    let focusProgress = 0;
 
     const container = document.getElementById('carousel');
-    container.style.transform = `rotateX(${tiltAngle}deg)`;
     const items = container.querySelectorAll('.carousel__item');
     const caption = document.getElementById('caption');
     const total = items.length;
@@ -133,14 +134,22 @@
       });
     }
 
+    function easeInOutCubic(t) {
+      return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    }
+
     function animate() {
       if (!isDragging) {
         if (targetAngle !== null) {
           const delta = targetAngle - angle;
-          angle += delta * focusEasing;
+          focusProgress += 0.003;
+          const t = Math.min(1, focusProgress);
+          const easingFactor = easeInOutCubic(t);
+          angle += delta * easingFactor * 0.1 + 0.01;
           if (Math.abs(delta) < 0.5) {
             angle = targetAngle;
             targetAngle = null;
+            focusProgress = 0;
             if (focusedIndex !== null) {
               caption.textContent = captions[focusedIndex];
               caption.classList.add('show');
@@ -196,7 +205,10 @@
         isPressed = false;
         lastX = null;
         if (!dragMoved) return;
-        rotateSpeed = Math.max(Math.min(releaseSpeed, Math.abs(baseRotateSpeed) * maxRotateMultiplier), -Math.abs(baseRotateSpeed) * maxRotateMultiplier);
+        rotateSpeed = Math.max(
+          Math.min(releaseSpeed, Math.abs(baseRotateSpeed) * maxRotateMultiplier),
+          -Math.abs(baseRotateSpeed) * maxRotateMultiplier
+        );
       }
     }
 
@@ -207,6 +219,7 @@
         focusedIndex = index;
         targetAngle = -360 / total * index;
         rotateSpeed = 0;
+        focusProgress = 0;
         caption.classList.remove('show');
         clearTimeout(focusTimeout);
       });

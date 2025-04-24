@@ -9,10 +9,7 @@
       --item-width: 40vmin;
       --item-height: 25vmin;
     }
-
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
     body {
       margin: 0;
       background: #111;
@@ -50,9 +47,26 @@
       object-fit: cover;
       border: 2px solid #fff;
       border-radius: 10px;
-      cursor: grab;
+      cursor: pointer;
       backface-visibility: hidden;
       user-select: none;
+    }
+    .caption {
+      position: absolute;
+      bottom: 10%;
+      left: 50%;
+      transform: translateX(-50%);
+      color: white;
+      background-color: rgba(0, 0, 0, 0.7);
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 1rem;
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .caption.show {
+      opacity: 1;
     }
     @media (max-aspect-ratio: 1/1) {
       :root {
@@ -68,32 +82,42 @@
 <body>
   <div class="carousel" id="carouselRoot">
     <div class="carousel__container" id="carousel">
-      <a class="carousel__item"><img src="https://picsum.photos/id/1011/600/400" draggable="false" /></a>
-      <a class="carousel__item"><img src="https://picsum.photos/id/1012/600/400" draggable="false" /></a>
-      <a class="carousel__item"><img src="https://picsum.photos/id/1013/600/400" draggable="false" /></a>
-      <a class="carousel__item"><img src="https://picsum.photos/id/1014/600/400" draggable="false" /></a>
-      <a class="carousel__item"><img src="https://picsum.photos/id/1015/600/400" draggable="false" /></a>
+      <a class="carousel__item" data-index="0"><img src="https://picsum.photos/id/1011/600/400" draggable="false" /></a>
+      <a class="carousel__item" data-index="1"><img src="https://picsum.photos/id/1012/600/400" draggable="false" /></a>
+      <a class="carousel__item" data-index="2"><img src="https://picsum.photos/id/1013/600/400" draggable="false" /></a>
+      <a class="carousel__item" data-index="3"><img src="https://picsum.photos/id/1014/600/400" draggable="false" /></a>
+      <a class="carousel__item" data-index="4"><img src="https://picsum.photos/id/1015/600/400" draggable="false" /></a>
     </div>
+    <div class="caption" id="caption"></div>
   </div>
 
   <script>
     const tiltAngle = -10;
-    const baseRotateSpeed = 0.02;
-    const maxRotateMultiplier = 2.0; // 可調整倍數倍率
+    const baseRotateSpeed = -0.1;
+    const maxRotateMultiplier = 8.0;
     const radiusRatio = 0.35;
     const minRadius = 180;
+    const easingBackToBase = 0.995;
 
     let rotateSpeed = baseRotateSpeed;
     let isDragging = false;
     let isPressed = false;
     let lastX = null;
     let angle = 0;
+    let releaseSpeed = 0;
+    let dragThreshold = 5;
+    let dragMoved = false;
+    let focusedIndex = null;
+    let targetAngle = null;
+    let focusTimeout = null;
+    const focusEasing = 0.01;
 
     const container = document.getElementById('carousel');
     container.style.transform = `rotateX(${tiltAngle}deg)`;
-
     const items = container.querySelectorAll('.carousel__item');
+    const caption = document.getElementById('caption');
     const total = items.length;
+    const captions = ["森林風景", "清晨海灘", "山間小徑", "城市夜景", "雪地旅程"];
 
     function getRadius() {
       const minDimension = Math.min(window.innerWidth, window.innerHeight);
@@ -110,7 +134,37 @@
     }
 
     function animate() {
-      if (!isDragging) angle += rotateSpeed;
+      if (!isDragging) {
+        if (targetAngle !== null) {
+          const delta = targetAngle - angle;
+          angle += delta * focusEasing;
+          if (Math.abs(delta) < 0.5) {
+            angle = targetAngle;
+            targetAngle = null;
+            if (focusedIndex !== null) {
+              caption.textContent = captions[focusedIndex];
+              caption.classList.add('show');
+              clearTimeout(focusTimeout);
+              focusTimeout = setTimeout(() => {
+                caption.classList.remove('show');
+                rotateSpeed = baseRotateSpeed;
+              }, 5000);
+            }
+          }
+        } else {
+          angle += rotateSpeed;
+          const direction = Math.sign(baseRotateSpeed);
+          const easingFactor = 1 - easingBackToBase;
+          if (Math.sign(rotateSpeed) === direction) {
+            rotateSpeed -= (rotateSpeed - baseRotateSpeed) * easingFactor;
+            if (Math.abs(rotateSpeed - baseRotateSpeed) < 0.001) {
+              rotateSpeed = baseRotateSpeed;
+            }
+          } else {
+            rotateSpeed *= easingBackToBase;
+          }
+        }
+      }
       updateCarousel();
       requestAnimationFrame(animate);
     }
@@ -118,18 +172,20 @@
     function onStart(x) {
       isPressed = true;
       isDragging = false;
+      dragMoved = false;
       lastX = x;
     }
 
     function onMove(x) {
       if (!isPressed) return;
-      if (!isDragging && lastX !== null && Math.abs(x - lastX) > 1) {
+      if (!isDragging && lastX !== null && Math.abs(x - lastX) > dragThreshold) {
         isDragging = true;
+        dragMoved = true;
       }
       if (isDragging && lastX !== null) {
         const dx = x - lastX;
         angle += dx * 0.2;
-        rotateSpeed = dx * 0.005;
+        releaseSpeed = dx * 0.005;
         lastX = x;
       }
     }
@@ -139,16 +195,28 @@
         isDragging = false;
         isPressed = false;
         lastX = null;
-        rotateSpeed = Math.max(Math.min(rotateSpeed, baseRotateSpeed * maxRotateMultiplier), -baseRotateSpeed * maxRotateMultiplier);
+        if (!dragMoved) return;
+        rotateSpeed = Math.max(Math.min(releaseSpeed, Math.abs(baseRotateSpeed) * maxRotateMultiplier), -Math.abs(baseRotateSpeed) * maxRotateMultiplier);
       }
     }
+
+    items.forEach(item => {
+      item.addEventListener('click', e => {
+        if (dragMoved) return;
+        const index = parseInt(item.dataset.index);
+        focusedIndex = index;
+        targetAngle = -360 / total * index;
+        rotateSpeed = 0;
+        caption.classList.remove('show');
+        clearTimeout(focusTimeout);
+      });
+    });
 
     const root = document.getElementById('carouselRoot');
     root.addEventListener('mousedown', e => onStart(e.clientX));
     root.addEventListener('mousemove', e => onMove(e.clientX));
     root.addEventListener('mouseup', onEnd);
     root.addEventListener('mouseleave', onEnd);
-
     root.addEventListener('touchstart', e => onStart(e.touches[0].clientX));
     root.addEventListener('touchmove', e => onMove(e.touches[0].clientX));
     root.addEventListener('touchend', onEnd);
@@ -159,3 +227,4 @@
   </script>
 </body>
 </html>
+
